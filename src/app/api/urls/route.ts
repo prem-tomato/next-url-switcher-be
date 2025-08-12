@@ -33,10 +33,20 @@ export const GET = async () => {
       },
       { headers: CORS_HEADERS }
     );
-  } catch (err: any) {
-    console.error("Query error:", err);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("Query error:", err);
+      return NextResponse.json(
+        { error: err.message },
+        {
+          status: 500,
+          headers: CORS_HEADERS,
+        }
+      );
+    }
+    console.error("Unknown error", err);
     return NextResponse.json(
-      { error: err.message },
+      { error: "Unknown error occurred" },
       {
         status: 500,
         headers: CORS_HEADERS,
@@ -47,7 +57,17 @@ export const GET = async () => {
 
 export const POST = async (req: NextRequest) => {
   try {
-    const { name, mainUrl, subUrls = {} } = await req.json();
+    const body = await req.json();
+
+    // You can add explicit typing for request body here
+    interface UrlRequestBody {
+      name: string;
+      mainUrl: string;
+      subUrls?: Record<string, string>;
+    }
+
+    const { name, mainUrl, subUrls = {} } = body as UrlRequestBody;
+
     const res = await query(
       `INSERT INTO urls (
             "name", 
@@ -73,10 +93,20 @@ export const POST = async (req: NextRequest) => {
       },
       { headers: CORS_HEADERS }
     );
-  } catch (err: any) {
-    console.error("Query error:", err);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error("Query error:", err);
+      return NextResponse.json(
+        { error: err.message },
+        {
+          status: 500,
+          headers: CORS_HEADERS,
+        }
+      );
+    }
+    console.error("Unknown error", err);
     return NextResponse.json(
-      { error: err.message },
+      { error: "Unknown error occurred" },
       {
         status: 500,
         headers: CORS_HEADERS,

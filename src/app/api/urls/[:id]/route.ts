@@ -23,7 +23,7 @@ const UrlCreateSchema = z.object({
 
 export const PUT = async (req: NextRequest) => {
   try {
-    const id = req.nextUrl.pathname.split("/").pop(); // get id from URL
+    const id = req.nextUrl.pathname.split("/").pop();
     if (!id) {
       return NextResponse.json(
         { success: false, error: "Missing id parameter" },
@@ -73,8 +73,15 @@ export const PUT = async (req: NextRequest) => {
       { success: true, data: serializedRow },
       { headers: CORS_HEADERS }
     );
-  } catch (error: any) {
-    console.error("Error updating URL:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error updating URL:", error);
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 500, headers: CORS_HEADERS }
+      );
+    }
+    console.error("Unknown error updating URL:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update URL" },
       { status: 500, headers: CORS_HEADERS }
@@ -84,7 +91,7 @@ export const PUT = async (req: NextRequest) => {
 
 export const DELETE = async (req: NextRequest) => {
   try {
-    const id = req.nextUrl.pathname.split("/").pop(); // get id from URL
+    const id = req.nextUrl.pathname.split("/").pop();
     if (!id) {
       return NextResponse.json(
         { success: false, error: "Missing id parameter" },
@@ -109,8 +116,15 @@ export const DELETE = async (req: NextRequest) => {
       { success: true, message: "URL deleted successfully" },
       { headers: CORS_HEADERS }
     );
-  } catch (error: any) {
-    console.error("Error deleting URL:", error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error deleting URL:", error);
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 500, headers: CORS_HEADERS }
+      );
+    }
+    console.error("Unknown error deleting URL:", error);
     return NextResponse.json(
       { success: false, error: "Failed to delete URL" },
       { status: 500, headers: CORS_HEADERS }

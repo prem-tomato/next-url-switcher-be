@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { Pool, PoolClient, QueryResult, QueryResultRow } from "pg";
 
 const pool = new Pool({
