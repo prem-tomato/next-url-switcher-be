@@ -172,7 +172,10 @@ export async function GET(request: NextRequest) {
       {
         success: true,
         data: {
-          url,
+          ...url,
+          createdAt: url.createdAt?.toISOString(),
+          updatedAt: url.updatedAt?.toISOString(),
+          deletedAt: url.deletedAt?.toISOString(),
         },
       },
       { headers: CORS_HEADERS }
