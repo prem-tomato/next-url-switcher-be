@@ -131,3 +131,67 @@ export const DELETE = async (req: NextRequest) => {
     );
   }
 };
+
+export async function GET(request: NextRequest) {
+  try {
+    const id = request.nextUrl.pathname.split("/").pop();
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Missing id parameter" },
+        { status: 400, headers: CORS_HEADERS }
+      );
+    }
+
+    if (!id) {
+      return NextResponse.json(
+        { success: false, error: "Missing id parameter" },
+        { status: 400, headers: CORS_HEADERS }
+      );
+    }
+
+    const res = await query(
+      `
+      SELECT id, name, "mainUrl", "subUrls", "isDeleted", "createdAt", "updatedAt", "deletedAt"
+      FROM urls
+      WHERE id = $1 AND "isDeleted" = false
+      LIMIT 1
+      `,
+      [id]
+    );
+
+    if (res.rows.length === 0) {
+      return NextResponse.json(
+        { success: false, error: "URL not found" },
+        { status: 404, headers: CORS_HEADERS }
+      );
+    }
+
+    const url = res.rows[0];
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          ...url,
+          createdAt: url.createdAt?.toISOString(),
+          updatedAt: url.updatedAt?.toISOString(),
+          deletedAt: url.deletedAt?.toISOString(),
+        },
+      },
+      { headers: CORS_HEADERS }
+    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.error("Error fetching URL:", error);
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 500, headers: CORS_HEADERS }
+      );
+    }
+    console.error("Unknown error fetching URL:", error);
+    return NextResponse.json(
+      { success: false, error: "Unknown error occurred" },
+      { status: 500, headers: CORS_HEADERS }
+    );
+  }
+}
